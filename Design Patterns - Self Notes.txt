@@ -1,0 +1,2589 @@
+
+
+
+Design patterns:
+
+1. Design patterns are already defined and industry standard approach to solve a recurring problem.
+2. It promotes reusability that leads to more robust and highly maintainable code. 
+3. It makes our code easy to understand and debug. It leads to faster development and new members of team understand it easily.
+
+
+It is divided into three categories – 
+
+1. creational, 
+2. structural, and 
+3. behavioral design patterns. 
+
+
+
+Creational Design Patterns  -  Creational design patterns provide solution to instantiate a object in the best possible way for specific situations.
+
+	Singleton Pattern   - 	ensures that only one instance of the class exists in the java virtual machine. 
+	Factory Pattern     -  	we have a super class with multiple sub-classes and based on input, we need to return one of the sub-class. 
+	
+	public abstract class Computer {
+	
+	public abstract String getRAM();
+	public abstract String getHDD();
+	public abstract String getCPU();
+	
+	@Override
+	public String toString(){
+		return "RAM= "+this.getRAM()+", HDD="+this.getHDD()+", CPU="+this.getCPU();
+	}
+}
+
+
+
+public class PC extends Computer {
+
+	private String ram;
+	private String hdd;
+	private String cpu;
+	
+	public PC(String ram, String hdd, String cpu){
+		this.ram=ram;
+		this.hdd=hdd;
+		this.cpu=cpu;
+	}
+	@Override
+	public String getRAM() {
+		return this.ram;
+	}
+
+	@Override
+	public String getHDD() {
+		return this.hdd;
+	}
+
+	@Override
+	public String getCPU() {
+		return this.cpu;
+	}
+
+}
+
+
+public class Laptop extends Computer {
+
+	private String ram;
+	private String hdd;
+	private String cpu;
+	
+	public Laptop(String ram, String hdd, String cpu){
+		this.ram=ram;
+		this.hdd=hdd;
+		this.cpu=cpu;
+	}
+	@Override
+	public String getRAM() {
+		return this.ram;
+	}
+
+	@Override
+	public String getHDD() {
+		return this.hdd;
+	}
+
+	@Override
+	public String getCPU() {
+		return this.cpu;
+	}
+
+}
+	
+	Abstract Factory Pattern   - we have a factory class for each sub-class and then an Abstract Factory class that will return the sub-class based on the input factory class. 
+	
+	public interface Window{
+		public void setTitle(String text);
+		public void repaint();
+	}
+	
+	
+	public class MSWindow implements Window{
+		public void setTitle(){
+		//MS Windows specific behaviour
+	}
+		public void repaint(){
+		//MS Windows specific behaviour
+		}
+	}
+	
+	
+	public class MacOSXWindow implements Window{
+		public void setTitle(){
+		//Mac OSX specific behaviour
+		}
+		public void repaint(){
+		//Mac OSX specific behaviour
+		}
+	}
+	
+	
+	public interface AbstractWidgetFactory{
+		public Window createWindow();
+	}
+	
+	public class MsWindowsWidgetFactory{
+		//create an MSWindow
+		public Window createWindow(){
+		MSWindow window = new MSWindow();
+		return window;
+		}
+	}
+	
+	
+	//ConcreteFactory2
+	public class MacOSXWidgetFactory{
+		//create a MacOSXWindow
+		public Window createWindow(){
+		MacOSXWindow window = new MacOSXWindow();
+		return window;
+	}
+	}
+	
+	
+	public class GUIBuilder{
+		public void buildWindow(AbstractWidgetFactory widgetFactory){
+		Window window = widgetFactory.createWindow();
+		window.setTitle("New Window");
+	}
+	}
+	
+	
+	public class Main{
+		public static void main(String[] args){
+		GUIBuilder builder = new GUIBuilder();
+		AbstractWidgetFactory widgetFactory = null;
+		//check what platform we're on
+		if(Platform.currentPlatform()=="MACOSX"){
+		widgetFactory  = new MacOSXWidgetFactory();
+		} else {
+      widgetFactory  = new MsWindowsWidgetFactory();
+		}
+		builder.buildWindow(widgetFactory);
+	}
+	}
+	
+
+	
+	
+	Builder Pattern - 		to solve some of the problems with Factory and Abstract Factory design patterns when the Object contains a lot of attributes. 
+								Builder pattern solves the issue with large number of optional parameters and 
+								inconsistent state by providing a way to build the object step-by-step and provide a method that will actually return the final Object.
+								
+							Steps to create builder pattern:
+							1.First of all you need to create a static nested class and then copy all the arguments from the outer class to the Builder class. We should follow the naming convention and if the class name is Computer then builder class should be named as ComputerBuilder.
+							2.Java Builder class should have a public constructor with all the required attributes as parameters.
+							3.Java Builder class should have methods to set the optional parameters and it should return the same Builder object after setting the optional attribute.
+							4.The final step is to provide a build() method in the builder class that will return the Object needed by client program. 
+								For this we need to have a private constructor in the Class with Builder class as argument.						
+	
+		public class Computer {
+	
+		//required parameters
+		private String HDD;
+		private String RAM;
+	
+		//optional parameters
+		private boolean isGraphicsCardEnabled;
+		private boolean isBluetoothEnabled;
+	
+
+	public String getHDD() {
+		return HDD;
+	}
+
+	public String getRAM() {
+		return RAM;
+	}
+
+	public boolean isGraphicsCardEnabled() {
+		return isGraphicsCardEnabled;
+	}
+
+	public boolean isBluetoothEnabled() {
+		return isBluetoothEnabled;
+	}
+	
+	private Computer(ComputerBuilder builder) {
+		this.HDD=builder.HDD;
+		this.RAM=builder.RAM;
+		this.isGraphicsCardEnabled=builder.isGraphicsCardEnabled;
+		this.isBluetoothEnabled=builder.isBluetoothEnabled;
+	}
+	
+	//Builder Class
+	public static class ComputerBuilder{
+
+		// required parameters
+		private String HDD;
+		private String RAM;
+
+		// optional parameters
+		private boolean isGraphicsCardEnabled;
+		private boolean isBluetoothEnabled;
+		
+		public ComputerBuilder(String hdd, String ram){
+			this.HDD=hdd;
+			this.RAM=ram;
+		}
+
+		public ComputerBuilder setGraphicsCardEnabled(boolean isGraphicsCardEnabled) {
+			this.isGraphicsCardEnabled = isGraphicsCardEnabled;
+			return this;
+		}
+
+		public ComputerBuilder setBluetoothEnabled(boolean isBluetoothEnabled) {
+			this.isBluetoothEnabled = isBluetoothEnabled;
+			return this;
+		}
+		
+		public Computer build(){
+			return new Computer(this);
+		}
+
+	}
+
+}
+
+
+
+public class TestBuilderPattern {
+	public static void main(String[] args) {
+				//Using builder to get the object in a single line of code and 
+                //without any inconsistent state or arguments management issues		
+		Computer comp = new Computer.ComputerBuilder("500 GB", "2 GB").setBluetoothEnabled(true).setGraphicsCardEnabled(true).build();
+	}
+}
+
+
+	
+	Prototype Pattern - 	this pattern provides a mechanism to copy the original object to a new object and then modify it according to our needs. This pattern uses java cloning to copy the object.
+
+							
+							public class Employees implements Cloneable{
+
+							private List<String> empList;
+	
+					public Employees(){
+					empList = new ArrayList<String>();
+					}
+	
+					public Employees(List<String> list){
+					this.empList=list;
+					}
+	
+	
+					public void loadData(){
+					//read all employees from database and put into the list
+					empList.add("Pankaj");
+					empList.add("Raj");
+					empList.add("David");
+					empList.add("Lisa");
+					}
+	
+			public List<String> getEmpList() {
+		return empList;
+	}
+
+	@Override
+	public Object clone() throws CloneNotSupportedException{
+			List<String> temp = new ArrayList<String>();
+			for(String s : this.getEmpList()){
+				temp.add(s);
+			}
+			return new Employees(temp);
+	}
+	
+}
+
+
+
+public class PrototypePatternTest {
+
+	public static void main(String[] args) throws CloneNotSupportedException {
+		Employees emps = new Employees();
+		emps.loadData();
+		
+		//Use the clone method to get the Employee object
+		Employees empsNew = (Employees) emps.clone();
+		Employees empsNew1 = (Employees) emps.clone();
+		List<String> list = empsNew.getEmpList();
+		list.add("John");
+		List<String> list1 = empsNew1.getEmpList();
+		list1.remove("Pankaj");
+		
+		System.out.println("emps List: "+emps.getEmpList());
+		System.out.println("empsNew List: "+list);
+		System.out.println("empsNew1 List: "+list1);
+	}
+
+}
+
+
+
+
+	
+Structural Design Patterns
+	Adapter Pattern  - 		Adapter design pattern is one of the structural design pattern and its used so that two unrelated interfaces can work together. The object that joins these unrelated interface is called an Adapter. As a real life example, we can think of a mobile charger as an adapter because mobile battery needs 3 volts to charge but the normal socket produces either 120V (US) or 240V (India). So the mobile charger works as an adapter between mobile charging socket and the wall socket.
+	
+	
+	
+
+public interface Xpay {
+	
+	public String getCreditCardNo();
+	public String getCustomerName();
+	public String getCardExpMonth();
+	public String getCardExpYear();
+	public Short getCardCVVNo();
+	public Double getAmount();
+	
+	public void setCreditCardNo(String creditCardNo);
+	public void setCustomerName(String customerName);
+	public void setCardExpMonth(String cardExpMonth);
+	public void setCardExpYear(String cardExpYear);
+	public void setCardCVVNo(Short cardCVVNo);
+	public void setAmount(Double amount);
+	
+}
+	
+	
+	package com.javacodegeeks.patterns.adapterpattern.site;
+
+import com.javacodegeeks.patterns.adapterpattern.xpay.Xpay;
+
+public class XpayImpl implements Xpay{
+
+	private String creditCardNo;
+	private String customerName;
+	private String cardExpMonth;
+	private String cardExpYear;
+	private Short cardCVVNo;
+	private Double amount;
+	
+	@Override
+	public String getCreditCardNo() {
+		return creditCardNo;
+	}
+
+	@Override
+	public String getCustomerName() {
+		return customerName;
+	}
+
+	@Override
+	public String getCardExpMonth() {
+		return cardExpMonth;
+	}
+
+	@Override
+	public String getCardExpYear() {
+		return cardExpYear;
+	}
+
+	@Override
+	public Short getCardCVVNo() {
+		return cardCVVNo;
+	}
+
+	@Override
+	public Double getAmount() {
+		return amount;
+	}
+
+	@Override
+	public void setCreditCardNo(String creditCardNo) {
+		this.creditCardNo = creditCardNo;
+	}
+
+	@Override
+	public void setCustomerName(String customerName) {
+		this.customerName = customerName;
+	}
+
+	@Override
+	public void setCardExpMonth(String cardExpMonth) {
+		this.cardExpMonth = cardExpMonth;
+	}
+
+	@Override
+	public void setCardExpYear(String cardExpYear) {
+		this.cardExpYear = cardExpYear;
+	}
+
+	@Override
+	public void setCardCVVNo(Short cardCVVNo) {
+		this.cardCVVNo = cardCVVNo;
+	}
+
+	@Override
+	public void setAmount(Double amount) {
+		this.amount = amount;
+	}
+
+}
+
+
+
+public interface PayD {
+	
+	public String getCustCardNo();
+	public String getCardOwnerName();
+	public String getCardExpMonthDate();
+	public Integer getCVVNo();
+	public Double getTotalAmount();
+	
+	public void setCustCardNo(String custCardNo);
+	public void setCardOwnerName(String cardOwnerName);
+	public void setCardExpMonthDate(String cardExpMonthDate);
+	public void setCVVNo(Integer cVVNo);
+	public void setTotalAmount(Double totalAmount);
+}
+
+
+
+
+public class XpayToPayDAdapter implements PayD{
+
+	private String custCardNo;
+	private String cardOwnerName;
+	private String cardExpMonthDate;
+	private Integer cVVNo;
+	private Double totalAmount;
+	
+	private final Xpay xpay;
+	
+	public XpayToPayDAdapter(Xpay xpay){
+		this.xpay = xpay;
+		setProp();
+	}
+
+	@Override
+	public String getCustCardNo() {
+		return custCardNo;
+	}
+
+	@Override
+	public String getCardOwnerName() {
+		return cardOwnerName;
+	}
+
+	@Override
+	public String getCardExpMonthDate() {
+		return cardExpMonthDate;
+	}
+
+	@Override
+	public Integer getCVVNo() {
+		return cVVNo;
+	}
+
+	@Override
+	public Double getTotalAmount() {
+		return totalAmount;
+	}
+
+	@Override
+	public void setCustCardNo(String custCardNo) {
+		this.custCardNo = custCardNo;
+	}
+
+	@Override
+	public void setCardOwnerName(String cardOwnerName) {
+		this.cardOwnerName = cardOwnerName;
+	}
+
+	@Override
+	public void setCardExpMonthDate(String cardExpMonthDate) {
+		this.cardExpMonthDate = cardExpMonthDate;
+	}
+
+	@Override
+	public void setCVVNo(Integer cVVNo) {
+		this.cVVNo = cVVNo;
+	}
+
+	@Override
+	public void setTotalAmount(Double totalAmount) {
+		this.totalAmount = totalAmount;
+	}
+	
+	private void setProp(){
+		setCardOwnerName(this.xpay.getCustomerName());
+		setCustCardNo(this.xpay.getCreditCardNo());
+		setCardExpMonthDate(this.xpay.getCardExpMonth()+"/"+this.xpay.getCardExpYear());
+		setCVVNo(this.xpay.getCardCVVNo().intValue());
+		setTotalAmount(this.xpay.getAmount());
+	}
+
+}
+
+public class RunAdapterExample {
+
+	public static void main(String[] args) {
+		
+		// Object for Xpay
+		Xpay xpay = new XpayImpl();
+		xpay.setCreditCardNo("4789565874102365");
+		xpay.setCustomerName("Max Warner");
+		xpay.setCardExpMonth("09");
+		xpay.setCardExpYear("25");
+		xpay.setCardCVVNo((short)235);
+		xpay.setAmount(2565.23);
+		
+		PayD payD = new XpayToPayDAdapter(xpay);
+		testPayD(payD);
+	}
+	
+	private static void testPayD(PayD payD){
+		
+		System.out.println(payD.getCardOwnerName());
+		System.out.println(payD.getCustCardNo());
+		System.out.println(payD.getCardExpMonthDate());
+		System.out.println(payD.getCVVNo());
+		System.out.println(payD.getTotalAmount());
+	}
+}
+	
+	
+	
+	Composite Pattern - 	Composite pattern is one of the Structural design pattern and is used when we have to represent a part-whole hierarchy. When we need to create a structure in a way that the objects in the structure has to be treated the same way, we can apply composite design pattern.
+								for eg: Lets understand it with a real life example – A diagram is a structure that consists of Objects such as Circle, Lines, Triangle etc and when we fill the drawing with color (say Red), the same color also gets applied to the Objects in the drawing. Here drawing is made up of different parts and they all have same operations.
+	
+	public interface Employee {
+
+   public void add(Employee employee);
+   public void remove(Employee employee);
+   public Employee getChild(int i);
+   public String getName();
+   public double getSalary();
+   public void print();
+}
+	
+	
+	public class Manager implements Employee{
+
+ private String name;
+ private double salary;
+
+ public Manager(String name,double salary){
+  this.name = name;
+  this.salary = salary;
+ }
+
+ List<Employee> employees = new ArrayList<Employee>();
+ public void add(Employee employee) {
+    employees.add(employee);
+ }
+
+ public Employee getChild(int i) {
+  return employees.get(i);
+ }
+
+ public String getName() {
+  return name;
+ }
+
+ public double getSalary() {
+  return salary;
+ }
+
+ public void print() {
+  System.out.println("-------------");
+  System.out.println("Name ="+getName());
+  System.out.println("Salary ="+getSalary());
+  System.out.println("-------------");
+
+  Iterator<Employee> employeeIterator = employees.iterator();
+    while(employeeIterator.hasNext()){
+     Employee employee = employeeIterator.next();
+     employee.print();
+    }
+ }
+
+ public void remove(Employee employee) {
+  employees.remove(employee);
+ }
+
+}
+
+
+
+public class Developer implements Employee{
+
+  private String name;
+  private double salary;
+
+  public Developer(String name,double salary){
+    this.name = name;
+    this.salary = salary;
+  }
+  public void add(Employee employee) {
+    //this is leaf node so this method is not applicable to this class.
+  }
+
+  public Employee getChild(int i) {
+    //this is leaf node so this method is not applicable to this class.
+    return null;
+  }
+
+  public String getName() {
+    return name;
+  }
+
+  public double getSalary() {
+    return salary;
+  }
+
+  public void print() {
+    System.out.println("-------------");
+    System.out.println("Name ="+getName());
+    System.out.println("Salary ="+getSalary());
+    System.out.println("-------------");
+  }
+
+  public void remove(Employee employee) {
+    //this is leaf node so this method is not applicable to this class.
+  }
+
+}
+
+
+
+
+
+public class CompositeDesignPatternMain {
+
+ public static void main(String[] args) {
+  Employee emp1=new Developer("John", 10000);
+  Employee emp2=new Developer("David", 15000);
+  Employee manager1=new Manager("Daniel",25000);
+  manager1.add(emp1);
+  manager1.add(emp2);
+  Employee emp3=new Developer("Michael", 20000);
+  Manager generalManager=new Manager("Mark", 50000);
+  generalManager.add(emp3);
+  generalManager.add(manager1);
+  generalManager.print();
+ }
+}
+
+
+
+Usage in JDK:
+java.util.Map#putAll(Map)
+java.util.List#addAll(Collection)
+java.util.Set#addAll(Collection
+
+
+
+	
+	
+	Proxy Pattern   - 		It provides the protection to the original object from the outside world. Proxy pattern intent is to “Provide a surrogate or placeholder for another object to control access to it”. The definition itself is very clear and proxy pattern is used when we want to provide controlled access of a functionality.
+	
+	public interface OfficeInternetAccess {  
+    public void grantInternetAccess();  
+}  
+
+
+public class RealInternetAccess implements OfficeInternetAccess {  
+    private String employeeName;  
+    public RealInternetAccess(String empName) {  
+        this.employeeName = empName;  
+    }  
+    @Override  
+    public void grantInternetAccess() {  
+        System.out.println("Internet Access granted for employee: "+ employeeName);  
+    }  
+} 
+
+public class ProxyInternetAccess implements OfficeInternetAccess {  
+           private String employeeName;  
+           private RealInternetAccess  realaccess;  
+               public ProxyInternetAccess(String employeeName) {  
+            this.employeeName = employeeName;  
+        }  
+        @Override  
+        public void grantInternetAccess()   
+        {  
+            if (getRole(employeeName) > 4)   
+            {  
+                realaccess = new RealInternetAccess(employeeName);  
+                realaccess.grantInternetAccess();  
+            }   
+            else   
+            {  
+                System.out.println("No Internet access granted. Your job level is below 5");  
+            }  
+        }  
+        public int getRole(String emplName) {  
+            // Check role from the database based on Name and designation  
+            // return job level or job designation.  
+            return 9;  
+        }  
+}  
+
+
+public class ProxyPatternClient {  
+    public static void main(String[] args)   
+    {  
+        OfficeInternetAccess access = new ProxyInternetAccess("Ashwani Rajput");  
+        access.grantInternetAccess();  
+    }  
+}
+	
+	One of the advantages of Proxy pattern is security.
+	This pattern avoids duplication of objects which might be huge size and memory intensive. This in turn increases the performance of the application.
+	The remote proxy also ensures about security by installing the local code proxy (stub) in the client machine and then accessing the server with help of the remote code.	
+	
+	
+	Flyweight Pattern  - 	Flyweight design pattern is used when we need to create a lot of Objects of a class. Since every object consumes memory space that can be crucial for low memory devices, such as mobile devices or embedded systems, it can be applied to reduce the load on memory by sharing objects.
+								for eg: String Pool implementation in java is one of the best example of Flyweight pattern implementation.
+	
+	
+	public interface Flyweight {
+
+	public void doMath(int a, int b);
+
+	}
+
+	public class FlyweightAdder implements Flyweight {
+
+	String operation;
+
+	public FlyweightAdder() {
+		operation = "adding";
+		try {
+			Thread.sleep(3000);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+	}
+
+	@Override
+	public void doMath(int a, int b) {
+		System.out.println(operation + " " + a + " and " + b + ": " + (a + b));
+	}
+
+	}
+	
+	
+	public class FlyweightMultiplier implements Flyweight {
+
+	String operation;
+
+	public FlyweightMultiplier() {
+		operation = "multiplying";
+		try {
+			Thread.sleep(3000);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+	}
+
+	@Override
+	public void doMath(int a, int b) {
+		System.out.println(operation + " " + a + " and " + b + ": " + (a * b));
+	}
+
+	}
+
+
+	public class FlyweightFactory {
+
+	private static FlyweightFactory flyweightFactory;
+
+	private Map<String, Flyweight> flyweightPool;
+
+	private FlyweightFactory() {
+		flyweightPool = new HashMap<String, Flyweight>();
+	}
+
+	public static FlyweightFactory getInstance() {
+		if (flyweightFactory == null) {
+			flyweightFactory = new FlyweightFactory();
+		}
+		return flyweightFactory;
+	}
+
+	public Flyweight getFlyweight(String key) {
+		if (flyweightPool.containsKey(key)) {
+			return flyweightPool.get(key);
+		} else {
+			Flyweight flyweight;
+			if ("add".equals(key)) {
+				flyweight = new FlyweightAdder();
+			} else {
+				flyweight = new FlyweightMultiplier();
+			}
+			flyweightPool.put(key, flyweight);
+			return flyweight;
+		}
+	}
+
+	}
+	
+	
+	public class FlyweightDemo {
+
+	public static void main(String[] args) {
+
+		FlyweightFactory flyweightFactory = FlyweightFactory.getInstance();
+
+		for (int i = 0; i < 5; i++) {
+			Flyweight flyweightAdder = flyweightFactory.getFlyweight("add");
+			flyweightAdder.doMath(i, i);
+
+			Flyweight flyweightMultiplier = flyweightFactory.getFlyweight("multiply");
+			flyweightMultiplier.doMath(i, i);
+		}
+	}
+	}
+
+	
+	
+	
+	
+	
+
+	
+	Eg: Use of Flyweight in JDK
+		java.lang.Integer#valueOf(int) (also on Boolean, Byte, Character, Short, Long, Float and Double). API doc says, "...this method is likely to yield significantly better space and time performance by caching frequently requested values
+	
+	Eg: Factory design pattern and singleton design pattern is used in implementing the flyweight.
+	
+	Facade Pattern - 		Facade Pattern is used to help client applications to easily interact with the system. Suppose we have an application with set of interfaces to use MySql/Oracle database and to generate different types of reports, such as HTML report, PDF report etc. So we will have different set of interfaces to work with different types of database. Now a client application can use these interfaces to get the required database connection and generate reports. But when the complexity increases or the interface behavior names are confusing, client application will find it difficult to manage it. So we can apply Facade pattern here and provide a wrapper interface on top of the existing interface to help client application. 
+	
+	
+public class Product {
+    public int productId;
+    public String name;
+    public Product(){}
+    public Product(int productId, String name){
+        this.productId=productId;
+        this.name=name;
+    }
+}
+
+
+
+public class InventoryService {
+    public static boolean isAvailable(Product product){
+        /*Check Warehouse database for product availability*/
+        return true;
+    }
+}
+
+
+
+
+public class PaymentService {
+    public static boolean makePayment(){
+        /*Connect with payment gateway for payment*/
+        return true;
+    }
+}
+
+
+public class ShippingService {
+    public static void shipProduct(Product product){
+         /*Connect with external shipment service to ship product*/
+    }
+}
+	
+	
+	
+
+
+public interface OrderServiceFacade {
+    boolean placeOrder(int productId);
+}
+
+
+
+
+package guru.springframework.gof.facade.servicefacade;
+
+import guru.springframework.gof.facade.domain.Product;
+import guru.springframework.gof.facade.subcomponents.PaymentService;
+import guru.springframework.gof.facade.subcomponents.ShippingService;
+import guru.springframework.gof.facade.subcomponents.InventoryService;
+
+public class OrderServiceFacadeImpl implements OrderServiceFacade{
+
+    public boolean placeOrder(int pId){
+        boolean orderFulfilled=false;
+        Product product=new Product();
+        product.productId=pId;
+        if(InventoryService.isAvailable(product))
+        {
+            System.out.println("Product with ID: "+ product.productId+" is available.");
+            boolean paymentConfirmed= PaymentService.makePayment();
+            if(paymentConfirmed){
+                System.out.println("Payment confirmed...");
+                ShippingService.shipProduct(product);
+                System.out.println("Product shipped...");
+                orderFulfilled=true;
+            }
+        }
+        return orderFulfilled;
+    }
+}
+
+
+
+
+public class OrderFulfillmentController {
+    OrderServiceFacade facade;
+    boolean orderFulfilled=false;
+    public void orderProduct(int productId) {
+        orderFulfilled=facade.placeOrder(productId);
+        System.out.println("OrderFulfillmentController: Order fulfillment completed. ");
+    }
+}
+	
+	Bridge Pattern   - 		When we have interface hierarchies in both interfaces as well as implementations, then bridge design pattern is used to decouple the interfaces from implementation and hiding the implementation details from the client programs.
+						 	for eg: The implementation of bridge design pattern follows the notion to prefer Composition over inheritance.
+	
+	public abstract class Vehicle {
+
+	Engine engine;
+	int weightInKilos;
+
+	public abstract void drive();
+
+	public void setEngine(Engine engine) {
+		this.engine = engine;
+	}
+
+	public void reportOnSpeed(int horsepower) {
+		int ratio = weightInKilos / horsepower;
+		if (ratio < 3) {
+			System.out.println("The vehicle is going at a fast speed.");
+		} else if ((ratio >= 3) && (ratio < 8)) {
+			System.out.println("The vehicle is going an average speed.");
+		} else {
+			System.out.println("The vehicle is going at a slow speed.");
+		}
+	}
+
+}
+
+
+public class BigBus extends Vehicle {
+
+	public BigBus(Engine engine) {
+		this.weightInKilos = 3000;
+		this.engine = engine;
+	}
+
+	@Override
+	public void drive() {
+		System.out.println("\nThe big bus is driving");
+		int horsepower = engine.go();
+		reportOnSpeed(horsepower);
+	}
+
+}
+
+
+public class SmallCar extends Vehicle {
+
+	public SmallCar(Engine engine) {
+		this.weightInKilos = 600;
+		this.engine = engine;
+	}
+
+	@Override
+	public void drive() {
+		System.out.println("\nThe small car is driving");
+		int horsepower = engine.go();
+		reportOnSpeed(horsepower);
+	}
+
+}
+
+
+public interface Engine {
+
+	public int go();
+
+}
+
+
+public class BigEngine implements Engine {
+
+	int horsepower;
+
+	public BigEngine() {
+		horsepower = 350;
+	}
+
+	@Override
+	public int go() {
+		System.out.println("The big engine is running");
+		return horsepower;
+	}
+
+}
+
+
+
+public class SmallEngine implements Engine {
+
+	int horsepower;
+
+	public SmallEngine() {
+		horsepower = 100;
+	}
+
+	@Override
+	public int go() {
+		System.out.println("The small engine is running");
+		return horsepower;
+	}
+
+}
+
+
+public class BridgeDemo {
+
+	public static void main(String[] args) {
+
+		Vehicle vehicle = new BigBus(new SmallEngine());
+		vehicle.drive();
+		vehicle.setEngine(new BigEngine());
+		vehicle.drive();
+
+		vehicle = new SmallCar(new SmallEngine());
+		vehicle.drive();
+		vehicle.setEngine(new BigEngine());
+		vehicle.drive();
+
+	}
+
+}
+
+
+
+	
+	
+	
+	Decorator Pattern  - 	Decorator design pattern is used to modify the functionality of an object at runtime. At the same time other instances of the same class will not be affected by this, so individual object gets the modified behavior. 
+							It uses abstract classes or interface with composition to implement.
+							We use inheritance or composition to extend the behavior of an object but this is done at compile time and its applicable to all the instances of the class. We can’t add any new functionality of remove any existing behavior at runtime – this is when Decorator pattern comes into picture. 
+							
+							
+							(or)
+						
+						A Decorator Pattern says that just "attach a flexible additional responsibilities to an object dynamically".
+
+						In other words, The Decorator Pattern uses composition instead of inheritance to extend the functionality of an object at runtime.
+
+						The Decorator Pattern is also known as Wrapper.
+	
+	public interface Icecream {
+  public String makeIcecream();
+}
+
+
+
+public class SimpleIcecream implements Icecream {
+
+  @Override
+  public String makeIcecream() {
+    return "Base Icecream";
+  }
+
+}
+
+
+abstract class IcecreamDecorator implements Icecream {
+
+  protected Icecream specialIcecream;
+
+  public IcecreamDecorator(Icecream specialIcecream) {
+    this.specialIcecream = specialIcecream;
+  }
+
+  public String makeIcecream() {
+    return specialIcecream.makeIcecream();
+  }
+}
+
+
+public class NuttyDecorator extends IcecreamDecorator {
+
+  public NuttyDecorator(Icecream specialIcecream) {
+    super(specialIcecream);
+  }
+
+  public String makeIcecream() {
+    return specialIcecream.makeIcecream() + addNuts();
+  }
+
+  private String addNuts() {
+    return " + cruncy nuts";
+  }
+}
+
+
+public class HoneyDecorator extends IcecreamDecorator {
+
+  public HoneyDecorator(Icecream specialIcecream) {
+    super(specialIcecream);
+  }
+
+  public String makeIcecream() {
+    return specialIcecream.makeIcecream() + addHoney();
+  }
+
+  private String addHoney() {
+    return " + sweet honey";
+  }
+}
+
+
+public class TestDecorator {
+
+  public static void main(String args[]) {
+    Icecream icecream = new HoneyDecorator(new NuttyDecorator(new SimpleIcecream()));
+    System.out.println(icecream.makeIcecream());
+  }
+
+}
+
+Decorator Design Pattern in java API
+java.io.BufferedReader;
+java.io.FileReader;
+java.io.Reader;
+
+
+
+
+	
+	
+Behavioral Design Patterns
+	Template Method Pattern  - 	Template Method is a behavioral design pattern and it’s used to create a method stub and deferring some of the steps of implementation to the subclasses.
+									Template method defines the steps to execute an algorithm and it can provide default implementation that might be common for all or some of the subclasses.
+									for eg: Suppose we want to provide an algorithm to build a house. The steps need to be performed to build a house are – building foundation, building pillars, building walls and windows. The important point is that the we can’t change the order of execution because we can’t build windows before building the foundation. So in this case we can create a template method that will use different methods to build the house.
+
+	
+
+abstract public class DataParser {
+
+    //Template method
+    //This method defines a generic structure for parsing data
+    public void parseDataAndGenerateOutput()
+    {
+        readData();
+        processData();
+        writeData();
+    }
+    //This methods will be implemented by its subclass
+    abstract void readData();
+    abstract void processData();
+
+    //We have to write output in a CSV file so this step will be same for all subclasses
+    public void writeData()
+    {
+        System.out.println('Output generated,writing to CSV');
+    }
+}
+	
+	
+	
+public class CSVDataParser extends DataParser {
+
+    void readData() {
+        System.out.println('Reading data from csv file');
+    }
+    void processData() {
+        System.out.println('Looping through loaded csv file');    
+    }
+}
+
+
+public class DatabaseDataParser extends DataParser {
+
+    void readData() {
+        System.out.println('Reading data from database');
+    }
+
+    void processData() {
+        System.out.println('Looping through datasets');        
+    }
+}
+
+
+public class TemplateMethodMain {
+
+    public static void main(String[] args) {
+
+        CSVDataParser csvDataParser=new CSVDataParser();
+        csvDataParser.parseDataAndGenerateOutput();
+        System.out.println('**********************');
+        DatabaseDataParser databaseDataParser=new DatabaseDataParser();
+        databaseDataParser.parseDataAndGenerateOutput();
+
+    }
+
+}
+
+	
+	Mediator Pattern  - 		Mediator design pattern is used to provide a centralized communication medium between different objects in a system. Mediator design pattern is very helpful in an enterprise application where multiple objects are interacting with each other. If the objects interact with each other directly, the system components are tightly-coupled with each other that makes maintainability cost higher and not flexible to extend easily. Mediator pattern focuses on provide a mediator between objects for communication and help in implementing lose-coupling between objects.
+									for eg: Air traffic controller is a great example of mediator pattern where the airport control room works as a mediator for communication between different flights. Mediator works as a router between objects and it can have it’s own logic to provide way of communication.
+	
+	public class Mediator {
+
+	Buyer swedishBuyer;
+	Buyer frenchBuyer;
+	AmericanSeller americanSeller;
+	DollarConverter dollarConverter;
+
+	public Mediator() {
+	}
+
+	public void registerSwedishBuyer(SwedishBuyer swedishBuyer) {
+		this.swedishBuyer = swedishBuyer;
+	}
+
+	public void registerFrenchBuyer(FrenchBuyer frenchBuyer) {
+		this.frenchBuyer = frenchBuyer;
+	}
+
+	public void registerAmericanSeller(AmericanSeller americanSeller) {
+		this.americanSeller = americanSeller;
+	}
+
+	public void registerDollarConverter(DollarConverter dollarConverter) {
+		this.dollarConverter = dollarConverter;
+	}
+
+	public boolean placeBid(float bid, String unitOfCurrency) {
+		float dollarAmount = dollarConverter.convertCurrencyToDollars(bid, unitOfCurrency);
+		return americanSeller.isBidAccepted(dollarAmount);
+	}
+}
+
+
+
+	public class Buyer {
+
+	Mediator mediator;
+	String unitOfCurrency;
+
+	public Buyer(Mediator mediator, String unitOfCurrency) {
+		this.mediator = mediator;
+		this.unitOfCurrency = unitOfCurrency;
+	}
+
+	public boolean attemptToPurchase(float bid) {
+		System.out.println("Buyer attempting a bid of " + bid + " " + unitOfCurrency);
+		return mediator.placeBid(bid, unitOfCurrency);
+	}
+}
+
+
+public class SwedishBuyer extends Buyer {
+
+	public SwedishBuyer(Mediator mediator) {
+		super(mediator, "krona");
+		this.mediator.registerSwedishBuyer(this);
+	}
+}
+
+
+
+public class FrenchBuyer extends Buyer {
+
+	public FrenchBuyer(Mediator mediator) {
+		super(mediator, "euro");
+		this.mediator.registerFrenchBuyer(this);
+	}
+}
+
+public class AmericanSeller {
+
+	Mediator mediator;
+	float priceInDollars;
+
+	public AmericanSeller(Mediator mediator, float priceInDollars) {
+		this.mediator = mediator;
+		this.priceInDollars = priceInDollars;
+		this.mediator.registerAmericanSeller(this);
+	}
+
+	public boolean isBidAccepted(float bidInDollars) {
+		if (bidInDollars >= priceInDollars) {
+			System.out.println("Seller accepts the bid of " + bidInDollars + " dollars\n");
+			return true;
+		} else {
+			System.out.println("Seller rejects the bid of " + bidInDollars + " dollars\n");
+			return false;
+		}
+	}
+
+}
+
+
+public class DollarConverter {
+
+	Mediator mediator;
+
+	public static final float DOLLAR_UNIT = 1.0f;
+	public static final float EURO_UNIT = 0.7f;
+	public static final float KRONA_UNIT = 8.0f;
+
+	public DollarConverter(Mediator mediator) {
+		this.mediator = mediator;
+		mediator.registerDollarConverter(this);
+	}
+
+	private float convertEurosToDollars(float euros) {
+		float dollars = euros * (DOLLAR_UNIT / EURO_UNIT);
+		System.out.println("Converting " + euros + " euros to " + dollars + " dollars");
+		return dollars;
+	}
+
+	private float convertKronorToDollars(float kronor) {
+		float dollars = kronor * (DOLLAR_UNIT / KRONA_UNIT);
+		System.out.println("Converting " + kronor + " kronor to " + dollars + " dollars");
+		return dollars;
+	}
+
+	public float convertCurrencyToDollars(float amount, String unitOfCurrency) {
+		if ("krona".equalsIgnoreCase(unitOfCurrency)) {
+			return convertKronorToDollars(amount);
+		} else {
+			return convertEurosToDollars(amount);
+		}
+	}
+}
+
+
+public class Demo {
+
+	public static void main(String[] args) {
+
+		Mediator mediator = new Mediator();
+
+		Buyer swedishBuyer = new SwedishBuyer(mediator);
+		Buyer frenchBuyer = new FrenchBuyer(mediator);
+		float sellingPriceInDollars = 10.0f;
+		AmericanSeller americanSeller = new AmericanSeller(mediator, sellingPriceInDollars);
+		DollarConverter dollarConverter = new DollarConverter(mediator);
+
+		float swedishBidInKronor = 55.0f;
+		while (!swedishBuyer.attemptToPurchase(swedishBidInKronor)) {
+			swedishBidInKronor += 15.0f;
+		}
+
+		float frenchBidInEuros = 3.0f;
+		while (!frenchBuyer.attemptToPurchase(frenchBidInEuros)) {
+			frenchBidInEuros += 1.5f;
+		}
+
+	}
+
+}
+	for eg: java.util.Timer class scheduleXXX() methods
+			Java Concurrency Executor execute() method.
+			java.lang.reflect.Method invoke() method.
+	
+	
+	Chain of Responsibility   - Chain of responsibility pattern is used to achieve lose coupling in software design where a request from client is passed to a chain of objects to process them. Then the object in the chain will decide themselves who will be processing the request and whether the request is required to be sent to the next object in the chain or not.
+									for eg: We know that we can have multiple catch blocks in a try-catch block code. Here every catch block is kind of a processor to process that particular exception. So when any exception occurs in the try block, its send to the first catch block to process. If the catch block is not able to process it, it forwards the request to next object in chain i.e next catch block. If even the last catch block is not able to process it, the exception is thrown outside of the chain to the calling program.
+	
+	public interface Chain {
+
+	public abstract void setNext(Chain nextInChain);
+	public abstract void process(Number request);
+}
+	
+	public class Number {
+	private int number;
+
+	public Number(int number) {
+		this.number = number;
+	}
+
+	public int getNumber() {
+		return number;
+	}
+
+}
+	public class NegativeProcessor implements Chain {
+
+	private Chain nextInChain;
+
+	public void setNext(Chain c) {
+		nextInChain = c;
+	}
+
+	public void process(Number request) {
+		if (request.getNumber() < 0) {
+			System.out.println("NegativeProcessor : " + request.getNumber());
+		} else {
+			nextInChain.process(request);
+		}
+	}
+}
+
+
+public class ZeroProcessor implements Chain {
+
+	private Chain nextInChain;
+
+	public void setNext(Chain c) {
+		nextInChain = c;
+	}
+
+	public void process(Number request) {
+		if (request.getNumber() == 0) {
+			System.out.println("ZeroProcessor : " + request.getNumber());
+		} else {
+			nextInChain.process(request);
+		}
+	}
+}
+
+
+
+public class PositiveProcessor implements Chain {
+
+	private Chain nextInChain;
+
+	public void setNext(Chain c) {
+		nextInChain = c;
+	}
+
+	public void process(Number request) {
+		if (request.getNumber() > 0) {
+			System.out.println("PositiveProcessor : " + request.getNumber());
+		} else {
+			nextInChain.process(request);
+		}
+	}
+}
+
+
+public class TestChain {
+	public static void main(String[] args) {
+		//configure Chain of Responsibility
+		Chain c1 = new NegativeProcessor();
+		Chain c2 = new ZeroProcessor();
+		Chain c3 = new PositiveProcessor();
+		c1.setNext(c2);
+		c2.setNext(c3);
+
+		//calling chain of responsibility
+		c1.process(new Number(99));
+		c1.process(new Number(-30));
+		c1.process(new Number(0));
+		c1.process(new Number(100));
+	}
+}
+
+	For eg: 
+	javax.servlet.Filter#doFilter()
+	java.util.logging.Logger#log
+	
+	Observer Pattern - 			is useful when you are interested in the state of an object and want to get notified whenever there is any change. In observer pattern, the object that watch on the state of another object are called Observer and the object that is being watched is called Subject.
+									for eg: Java Message Service (JMS) uses Observer pattern along with Mediator pattern to allow applications to subscribe and publish data to other applications. 
+								Java Message Service (JMS) uses Observer design pattern along with Mediator pattern to allow applications to subscribe and publish data to other applications.
+	
+	
+	public interface Subject {
+
+	//methods to register and unregister observers
+	public void register(Observer obj);
+	public void unregister(Observer obj);
+	
+	//method to notify observers of change
+	public void notifyObservers();
+	
+	//method to get updates from subject
+	public Object getUpdate(Observer obj);
+	
+}
+	
+	
+	public interface Observer {
+	
+	//method to update the observer, used by subject
+	public void update();
+	
+	//attach with subject to observe
+	public void setSubject(Subject sub);
+}
+
+
+
+public class MyTopic implements Subject {
+
+	private List<Observer> observers;
+	private String message;
+	private boolean changed;
+	private final Object MUTEX= new Object();
+	
+	public MyTopic(){
+		this.observers=new ArrayList<>();
+	}
+	@Override
+	public void register(Observer obj) {
+		if(obj == null) throw new NullPointerException("Null Observer");
+		synchronized (MUTEX) {
+		if(!observers.contains(obj)) observers.add(obj);
+		}
+	}
+
+	@Override
+	public void unregister(Observer obj) {
+		synchronized (MUTEX) {
+		observers.remove(obj);
+		}
+	}
+
+	@Override
+	public void notifyObservers() {
+		List<Observer> observersLocal = null;
+		//synchronization is used to make sure any observer registered after message is received is not notified
+		synchronized (MUTEX) {
+			if (!changed)
+				return;
+			observersLocal = new ArrayList<>(this.observers);
+			this.changed=false;
+		}
+		for (Observer obj : observersLocal) {
+			obj.update();
+		}
+
+	}
+
+	@Override
+	public Object getUpdate(Observer obj) {
+		return this.message;
+	}
+	
+	//method to post message to the topic
+	public void postMessage(String msg){
+		System.out.println("Message Posted to Topic:"+msg);
+		this.message=msg;
+		this.changed=true;
+		notifyObservers();
+	}
+
+}
+
+
+public class MyTopicSubscriber implements Observer {
+	
+	private String name;
+	private Subject topic;
+	
+	public MyTopicSubscriber(String nm){
+		this.name=nm;
+	}
+	@Override
+	public void update() {
+		String msg = (String) topic.getUpdate(this);
+		if(msg == null){
+			System.out.println(name+":: No new message");
+		}else
+		System.out.println(name+":: Consuming message::"+msg);
+	}
+
+	@Override
+	public void setSubject(Subject sub) {
+		this.topic=sub;
+	}
+
+}
+
+public class ObserverPatternTest {
+
+	public static void main(String[] args) {
+		//create subject
+		MyTopic topic = new MyTopic();
+		
+		//create observers
+		Observer obj1 = new MyTopicSubscriber("Obj1");
+		Observer obj2 = new MyTopicSubscriber("Obj2");
+		Observer obj3 = new MyTopicSubscriber("Obj3");
+		
+		//register observers to the subject
+		topic.register(obj1);
+		topic.register(obj2);
+		topic.register(obj3);
+		
+		//attach observer to subject
+		obj1.setSubject(topic);
+		obj2.setSubject(topic);
+		obj3.setSubject(topic);
+		
+		//check if any update is available
+		obj1.update();
+		
+		//now send message to subject
+		topic.postMessage("New Message");
+	}
+
+}
+
+	for eg: 	java.util.EventListener in Swing
+				javax.servlet.http.HttpSessionBindingListener
+				javax.servlet.http.HttpSessionAttributeListener
+				
+				
+for eg:
+
+interface Observer {
+       public void update(float interest);
+}
+
+interface Subject {
+       public void registerObserver(Observer observer);
+
+       public void removeObserver(Observer observer);
+
+       public void notifyObservers();
+}
+
+class Loan implements Subject {
+       private ArrayList<Observer> observers = new ArrayList<Observer>();
+       private String type;
+       private float interest;
+       private String bank;
+
+       public Loan(String type, float interest, String bank) {
+              this.type = type;
+              this.interest = interest;
+              this.bank = bank;
+       }
+
+       public float getInterest() {
+              return interest;
+       }
+
+       public void setInterest(float interest) {
+              this.interest = interest;
+              notifyObservers();
+       }
+
+       public String getBank() {
+              return this.bank;
+       }
+
+       public String getType() {
+              return this.type;
+       }
+
+       @Override
+       public void registerObserver(Observer observer) {
+              observers.add(observer);
+
+       }
+
+       @Override
+       public void removeObserver(Observer observer) {
+              observers.remove(observer);
+
+       }
+
+       @Override
+       public void notifyObservers() {
+              for (Observer ob : observers) {
+                     System.out
+                                  .println("Notifying Observers on change in Loan interest rate");
+                     ob.update(this.interest);
+              }
+
+       }
+
+}
+
+class Newspaper implements Observer {
+       @Override
+       public void update(float interest) {
+              System.out.println("Newspaper: Interest Rate updated, new Rate is: "
+                           + interest);
+       }
+}
+
+class Internet implements Observer {
+       @Override
+       public void update(float interest) {
+              System.out.println("Internet: Interest Rate updated, new Rate is: "
+                           + interest);
+       }
+}
+
+public class ObserverTest {
+
+       public static void main(String args[]) {
+              // this will maintain all loans information
+              Newspaper printMedia = new Newspaper();
+              Internet onlineMedia = new Internet();
+
+              Loan personalLoan = new Loan("Personal Loan", 12.5f,
+                           "Standard Charterd");
+              personalLoan.registerObserver(printMedia);
+              personalLoan.registerObserver(onlineMedia);
+              personalLoan.setInterest(3.5f);
+
+       }
+}
+
+Main advantage is loose coupling between objects called observer and observable. The subject only know the list of observers it don’t care about how they have their implementation.All the observers are notified by subject in a single event call as Broadcast communication
+
+
+	
+	Strategy Pattern - 			Strategy pattern is used when we have multiple algorithm for a specific task and client decides the actual implementation to be used at runtime.
+									for eg: One of the best example of this pattern is Collections.sort() method that takes Comparator parameter. Based on the different implementations of Comparator interfaces, the Objects are getting sorted in different ways.					
+								The Strategy pattern is to be used where you want to choose the algorithm to use at runtime. A good use of the Strategy pattern would be saving files in different formats, running various sorting algorithms, or file compression.
+
+								The Strategy pattern provides a way to define a family of algorithms, encapsulate each one as an object, and make them interchangeable. 
+
+		//Strategy Interface
+	public interface CompressionStrategy {
+	public void compressFiles(ArrayList<File> files);
+	}
+	
+	
+	public class ZipCompressionStrategy implements CompressionStrategy {
+  public void compressFiles(ArrayList<File> files) {
+    //using ZIP approach
+  }
+	}
+	
+	
+	public class RarCompressionStrategy implements CompressionStrategy {
+  public void compressFiles(ArrayList<File> files) {
+    //using RAR approach
+  }
+}
+
+
+
+public class CompressionContext {
+  private CompressionStrategy strategy;
+  //this can be set at runtime by the application preferences
+  public void setCompressionStrategy(CompressionStrategy strategy) {
+    this.strategy = strategy;
+  }
+  
+  //use the strategy
+  public void createArchive(ArrayList<File> files) {
+    strategy.compressFiles(files);
+  }
+}
+
+
+
+public class Client {
+  public static void main(String[] args) {
+    CompressionContext ctx = new CompressionContext();
+    //we could assume context is already set by preferences
+    ctx.setCompressionStrategy(new ZipCompressionStrategy());
+    //get a list of files...
+    ctx.createArchive(fileList);
+  }
+}
+
+	Command Pattern - 			it is used to implement lose coupling in a request-response model. In command pattern, the request is send to the invoker and invoker pass it to the encapsulated command object. Command object passes the request to the appropriate method of Receiver to perform the specific action.
+	class Fan {
+        public void startRotate() {
+                System.out.println("Fan is rotating");
+        }
+        public void stopRotate() {
+                System.out.println("Fan is not rotating");
+        }
+}
+class Light {
+        public void turnOn( ) {
+                System.out.println("Light is on ");
+        }
+        public void turnOff( ) {
+                System.out.println("Light is off");
+        }
+}
+class Switch {
+        private Command UpCommand, DownCommand;
+        public Switch( Command Up, Command Down) {
+                UpCommand = Up; // concrete Command registers itself with the invoker 
+                DownCommand = Down;
+        }
+        void flipUp( ) { // invoker calls back concrete Command, which executes the Command on the receiver 
+                        UpCommand . execute ( ) ;                           
+        }
+        void flipDown( ) {
+                        DownCommand . execute ( );
+        }
+}
+class LightOnCommand implements Command {
+        private Light myLight;
+        public LightOnCommand ( Light L) {
+                myLight  =  L;
+        }
+        public void execute( ) {
+                myLight . turnOn( );
+        }
+}
+class LightOffCommand implements Command {
+        private Light myLight;
+        public LightOffCommand ( Light L) {
+                myLight  =  L;
+        }
+        public void execute( ) {
+                myLight . turnOff( );
+        }
+}
+class FanOnCommand implements Command {
+        private Fan myFan;
+        public FanOnCommand ( Fan F) {
+                myFan  =  F;
+        }
+        public void execute( ) {
+                myFan . startRotate( );
+        }
+}
+class FanOffCommand implements Command {
+        private Fan myFan;
+        public FanOffCommand ( Fan F) {
+                myFan  =  F;
+        }
+        public void execute( ) {
+                myFan . stopRotate( );
+        }
+}
+public class TestCommand {
+                public static void main(String[] args) {
+                        Light  testLight = new Light( );
+                        LightOnCommand testLOC = new LightOnCommand(testLight);
+                        LightOffCommand testLFC = new LightOffCommand(testLight);
+                        Switch testSwitch = new Switch( testLOC,testLFC);       
+                        testSwitch.flipUp( );
+                        testSwitch.flipDown( );
+                        Fan testFan = new Fan( );
+                        FanOnCommand foc = new FanOnCommand(testFan);
+                        FanOffCommand ffc = new FanOffCommand(testFan);
+                        Switch ts = new Switch( foc,ffc);
+                        ts.flipUp( );
+                        ts.flipDown( ); 
+                }
+}               
+Command.java
+public interface Command {
+        public abstract void execute ( );
+}
+	
+	
+	In the command pattern, the invoker is decoupled from the action performed by the receiver. The invoker has no knowledge of the receiver. The invoker invokes a command, and the command executes the appropriate action of the receiver. Thus, the invoker can invoke commands without knowing the details of the action to be performed. In addition, this decoupling means that changes to the receiver's action don't directly affect the invocation of the action.
+
+	The command pattern can be used to perform 'undo' functionality. In this case, the Command interface should include an unexecute() method.
+	Client - Creates Concrete Command Object and configure with Receiver
+	Invoker - Who hold command and calls execute() method on Command object
+	Receiver - Actual object, which process the request
+	Command - Interface, which take request from Invoker and delegates to Receiver
+	ConcreteCommand - implementation of Command interface for doing a particular task
+
+	for eg:
+	Client.java
+
+
+import java.util.HashMap;
+import java.util.Map;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+/**
+ * Java program to implement Command design pattern with example.
+ * 
+ * @author Javin Paul
+ */
+public class Client {
+
+    private static final Logger logger = LoggerFactory.getLogger(Client.class);
+
+    public static void main(String args[]) {
+       
+      // Client creates Invoker object, command object and configure them 
+      Menu menu = new Menu();
+      menu.setCommand("Create", new CreateCommand());
+      menu.setCommand("Delete", new DeleteCommand());
+     
+      //Invoker invokes command
+      menu.runCommand("Create");
+      menu.runCommand("Delete");
+    }
+
+  
+}
+Output:
+Creating file
+Deleting file
+
+
+This class represents a command
+
+Menu.java 
+
+
+/*
+ * Invoker class, which holds command object and invokes method
+ */
+public class Menu{
+    Map menuItems = new HashMap();
+   
+    public void setCommand(String operation, Command cmd){
+        menuItems.put(operation, cmd);
+    }
+   
+    public void runCommand(String operation){
+        menuItems.get(operation).execute();
+    }
+ 
+}
+
+An interface to represent commands :
+
+Command.java
+
+/*
+ * Command interface for implementing concrete command
+ */
+interface Command{
+    public void execute();
+}
+
+Some implementation of command interface, this command will delete files
+
+DeleteCommand.java
+
+/*
+ * Concrete command to delete files
+ */
+public class DeleteCommand implements Command{
+
+    @Override
+    public void execute() {
+        System.out.println("Deleting file");
+    }
+}
+
+Another implementation of command interface to create files :
+
+CreateCommand.java
+
+/*
+ * Concrete command to create file
+ */
+public class CreateCommand implements Command{
+   
+    @Override
+    public void execute() {
+        System.out.println("Creating file");
+    }
+}
+
+
+
+	
+	for eg: Two of the Command pattern examples from JDK are java.lang.Runnable and javax.swing.Action interface. Thread Pool executors are invoker of Runnable commands.
+
+
+	
+	
+	State Pattern  - 			is used when an Object change it’s behavior based on it’s internal state.
+	
+	for eg:
+	public class TVRemoteBasic {
+
+	private String state="";
+	
+	public void setState(String state){
+		this.state=state;
+	}
+	
+	public void doAction(){
+		if(state.equalsIgnoreCase("ON")){
+			System.out.println("TV is turned ON");
+		}else if(state.equalsIgnoreCase("OFF")){
+			System.out.println("TV is turned OFF");
+		}
+	}
+
+	public static void main(String args[]){
+		TVRemoteBasic remote = new TVRemoteBasic();
+		
+		remote.setState("ON");
+		remote.doAction();
+		
+		remote.setState("OFF");
+		remote.doAction();
+	}
+
+}
+
+
+
+for eg:
+
+interface MobileAlertState 
+{
+    public void alert(AlertStateContext ctx);
+}
+ 
+class AlertStateContext 
+{
+    private MobileAlertState currentState;
+ 
+    public AlertStateContext() 
+    {
+        currentState = new Vibration();
+    }
+ 
+    public void setState(MobileAlertState state) 
+    {
+        currentState = state;
+    }
+ 
+    public void alert() 
+    {
+        currentState.alert(this);
+    }
+}
+ 
+class Vibration implements MobileAlertState 
+{
+    @Override
+    public void alert(AlertStateContext ctx) 
+    {
+         System.out.println("vibration...");
+    }
+ 
+}
+ 
+class Silent implements MobileAlertState
+{
+    @Override
+    public void alert(AlertStateContext ctx) 
+    {
+        System.out.println("silent...");
+    }
+ 
+}
+ 
+class StatePattern 
+{
+    public static void main(String[] args) 
+    {
+        AlertStateContext stateContext = new AlertStateContext();
+        stateContext.alert();
+        stateContext.alert();
+        stateContext.setState(new Silent());
+        stateContext.alert();
+        stateContext.alert();        
+    }
+}
+
+	Visitor Pattern  - 			we can move the operational logic from the objects to another class. For example, think of a Shopping cart where we can add different type of items (Elements), when we click on checkout button, it calculates the total amount to be paid. Now we can have the calculation logic in item classes or we can move out this logic to another class using visitor pattern. 
+	
+	public interface ItemElement {
+
+	public int accept(ShoppingCartVisitor visitor);
+}
+
+
+public class Book implements ItemElement {
+
+	private int price;
+	private String isbnNumber;
+	
+	public Book(int cost, String isbn){
+		this.price=cost;
+		this.isbnNumber=isbn;
+	}
+	
+	public int getPrice() {
+		return price;
+	}
+
+	public String getIsbnNumber() {
+		return isbnNumber;
+	}
+
+	@Override
+	public int accept(ShoppingCartVisitor visitor) {
+		return visitor.visit(this);
+	}
+
+}
+
+
+public class Fruit implements ItemElement {
+	
+	private int pricePerKg;
+	private int weight;
+	private String name;
+	
+	public Fruit(int priceKg, int wt, String nm){
+		this.pricePerKg=priceKg;
+		this.weight=wt;
+		this.name = nm;
+	}
+	
+	public int getPricePerKg() {
+		return pricePerKg;
+	}
+
+
+	public int getWeight() {
+		return weight;
+	}
+
+	public String getName(){
+		return this.name;
+	}
+	
+	@Override
+	public int accept(ShoppingCartVisitor visitor) {
+		return visitor.visit(this);
+	}
+
+}
+
+public interface ShoppingCartVisitor {
+
+	int visit(Book book);
+	int visit(Fruit fruit);
+}
+
+
+public class ShoppingCartVisitorImpl implements ShoppingCartVisitor {
+
+	@Override
+	public int visit(Book book) {
+		int cost=0;
+		//apply 5$ discount if book price is greater than 50
+		if(book.getPrice() > 50){
+			cost = book.getPrice()-5;
+		}else cost = book.getPrice();
+		System.out.println("Book ISBN::"+book.getIsbnNumber() + " cost ="+cost);
+		return cost;
+	}
+
+	@Override
+	public int visit(Fruit fruit) {
+		int cost = fruit.getPricePerKg()*fruit.getWeight();
+		System.out.println(fruit.getName() + " cost = "+cost);
+		return cost;
+	}
+
+}
+
+
+
+public class ShoppingCartClient {
+
+	public static void main(String[] args) {
+		ItemElement[] items = new ItemElement[]{new Book(20, "1234"),new Book(100, "5678"),
+				new Fruit(10, 2, "Banana"), new Fruit(5, 5, "Apple")};
+		
+		int total = calculatePrice(items);
+		System.out.println("Total Cost = "+total);
+	}
+
+	private static int calculatePrice(ItemElement[] items) {
+		ShoppingCartVisitor visitor = new ShoppingCartVisitorImpl();
+		int sum=0;
+		for(ItemElement item : items){
+			sum = sum + item.accept(visitor);
+		}
+		return sum;
+	}
+
+}
+			for eg:
+			the visitor design pattern is a way of separating an algorithm from an object structure on which it operates. A practical result of this separation is the ability to add new operations to existing object structures without modifying those structures.
+			It is one way to follow the open/closed principle (one of SOLID design principles).
+	
+	Implementation code
+Let’s look at the source code of different files involved into above discussed problem and solution.
+
+Router.java
+
+public interface Router
+{
+    public void sendData(char[] data);
+    public void acceptData(char[] data);
+     
+    public void accept(RouterVisitor v);
+}
+DLinkRouter.java
+
+public class DLinkRouter implements Router{
+ 
+    @Override
+    public void sendData(char[] data) {
+    }
+ 
+    @Override
+    public void acceptData(char[] data) {
+    }
+ 
+    @Override
+    public void accept(RouterVisitor v) {
+        v.visit(this);
+    }
+}
+LinkSysRouter.java
+
+public class LinkSysRouter implements Router{
+ 
+    @Override
+    public void sendData(char[] data) {
+    }
+ 
+    @Override
+    public void acceptData(char[] data) {
+    }
+     
+    @Override
+    public void accept(RouterVisitor v) {
+        v.visit(this);
+    }
+}
+TPLinkRouter.java
+
+public class TPLinkRouter implements Router{
+ 
+    @Override
+    public void sendData(char[] data) {
+    }
+ 
+    @Override
+    public void acceptData(char[] data) {
+    }
+     
+    @Override
+    public void accept(RouterVisitor v) {
+        v.visit(this);
+    }
+}
+RouterVisitor.java
+
+public interface RouterVisitor {
+    public void visit(DLinkRouter router);
+    public void visit(TPLinkRouter router);
+    public void visit(LinkSysRouter router);
+}
+LinuxConfigurator.java
+
+public class LinuxConfigurator implements RouterVisitor{
+ 
+    @Override
+    public void visit(DLinkRouter router) {
+        System.out.println("DLinkRouter Configuration for Linux complete !!");
+    }
+ 
+    @Override
+    public void visit(TPLinkRouter router) {
+        System.out.println("TPLinkRouter Configuration for Linux complete !!");
+    }
+ 
+    @Override
+    public void visit(LinkSysRouter router) {
+        System.out.println("LinkSysRouter Configuration for Linux complete !!");
+    }
+}
+MacConfigurator.java
+
+public class MacConfigurator implements RouterVisitor{
+ 
+    @Override
+    public void visit(DLinkRouter router) {
+        System.out.println("DLinkRouter Configuration for Mac complete !!");
+    }
+ 
+    @Override
+    public void visit(TPLinkRouter router) {
+        System.out.println("TPLinkRouter Configuration for Mac complete !!");
+    }
+ 
+    @Override
+    public void visit(LinkSysRouter router) {
+        System.out.println("LinkSysRouter Configuration for Mac complete !!");
+    }
+}
+
+
+public class TestVisitorPattern extends TestCase
+{
+    private MacConfigurator macConfigurator;
+    private LinuxConfigurator linuxConfigurator;
+    private DLinkRouter dlink;
+    private TPLinkRouter tplink;
+    private LinkSysRouter linksys;
+     
+    public void setUp()
+    {
+        macConfigurator = new MacConfigurator();
+        linuxConfigurator = new LinuxConfigurator();
+         
+        dlink = new DLinkRouter();
+        tplink = new TPLinkRouter();
+        linksys = new LinkSysRouter();
+    }
+     
+    public void testDlink()
+    {
+        dlink.accept(macConfigurator);
+        dlink.accept(linuxConfigurator);
+    }
+     
+    public void testTPLink()
+    {
+        tplink.accept(macConfigurator);
+        tplink.accept(linuxConfigurator);
+    }
+     
+    public void testLinkSys()
+    {
+        linksys.accept(macConfigurator);
+        linksys.accept(linuxConfigurator);
+    }
+}
+
+
+
+	
+	
+	
+	Interpreter Pattern  - 		The best example of this pattern is java compiler that interprets the java source code into byte code that is understandable by JVM. Google Translator is also an example of interpreter pattern where the input can be in any language and we can get the output interpreted in another language.
+	
+	
+	public class InterpreterContext {
+
+	public String getBinaryFormat(int i){
+		return Integer.toBinaryString(i);
+	}
+	
+	public String getHexadecimalFormat(int i){
+		return Integer.toHexString(i);
+	}
+}
+
+
+
+
+public interface Expression {
+
+	String interpret(InterpreterContext ic);
+}
+
+
+public class IntToBinaryExpression implements Expression {
+
+	private int i;
+	
+	public IntToBinaryExpression(int c){
+		this.i=c;
+	}
+	@Override
+	public String interpret(InterpreterContext ic) {
+		return ic.getBinaryFormat(this.i);
+	}
+
+}
+
+
+public class IntToHexExpression implements Expression {
+
+	private int i;
+	
+	public IntToHexExpression(int c){
+		this.i=c;
+	}
+	
+	@Override
+	public String interpret(InterpreterContext ic) {
+		return ic.getHexadecimalFormat(i);
+	}
+
+}
+
+
+
+public class InterpreterClient {
+
+	public InterpreterContext ic;
+	
+	public InterpreterClient(InterpreterContext i){
+		this.ic=i;
+	}
+	
+	public String interpret(String str){
+		Expression exp = null;
+		//create rules for expressions
+		if(str.contains("Hexadecimal")){
+			exp=new IntToHexExpression(Integer.parseInt(str.substring(0,str.indexOf(" "))));
+		}else if(str.contains("Binary")){
+			exp=new IntToBinaryExpression(Integer.parseInt(str.substring(0,str.indexOf(" "))));
+		}else return str;
+		
+		return exp.interpret(ic);
+	}
+	
+	public static void main(String args[]){
+		String str1 = "28 in Binary";
+		String str2 = "28 in Hexadecimal";
+		
+		InterpreterClient ec = new InterpreterClient(new InterpreterContext());
+		System.out.println(str1+"= "+ec.interpret(str1));
+		System.out.println(str2+"= "+ec.interpret(str2));
+
+	}
+}
+
+
+for eg:
+
+java.util.Pattern
+java.text.Normalizer
+java.text.Format
+
+
+points to remember:
+Interpreter pattern can be used when we can create a syntax tree for the grammar we have.
+Interpreter design pattern requires a lot of error checking and a lot of expressions and code to evaluate them. 
+	It gets complicated when the grammar becomes more complicated and hence hard to maintain and provide efficiency.
+java.util.Pattern and subclasses of java.text.Format are some of the examples of interpreter pattern used in JDK.
+
+
+
+	
+	
+	
+	Iterator Pattern  - 		traverse through a group of Objects.it hides the actual implementation of traversal through the collection and client programs just use iterator methods. 
+	
+	
+	Iterator pattern is useful when you want to provide a standard way to iterate over a collection and hide the implementation logic from client program.
+	The logic for iteration is embedded in the collection itself and it helps client program to iterate over them easily.
+	
+	for eg:
+	We all know that Collection framework Iterator is the best example of iterator pattern implementation but do you know that java.util.Scanner class also Implements Iterator interface.
+	Iterator Pattern used in JDK
+
+In java.util package, the Iterator interface is defined as follows:
+
+public interface Iterator<E> {
+    boolean hasNext();
+    E next();
+    void remove();
+}
+
+
+	
+	Memento Pattern  - Memento design pattern is one of the behavioral design pattern. Memento design pattern is used when we want to save the state of an object so that we can restore later on. 
+		Memento pattern is used to implement this in such a way that the saved state data of the object is not accessible outside of the object, this protects the integrity of saved state data.
+	for eg: We can use Serialization to achieve memento pattern implementation that is more generic rather than Memento pattern where every object needs to have it’s own Memento class implementation.
+	
+	In implementing memento pattern, we have two objects of interest,
+
+	originator – the object for which the state is to be saved. It creates the memento and uses it in future to undo.
+	memento – the object that is going to maintain the state of originator. Its just a POJO.
+	caretaker – the object that keeps track of multiple memento. Like maintaining savepoints.
+	
+	for eg: The originator will store the state information in the memento object and retrieve old state information when it needs to back track. The memento just stores what the originator gives to it.
+		Memento object is unreachable for other objects in the application.
+		
+		
+		public class Memento {
+	private String state;
+	
+	public Memento(String state){
+		this.state = state;
+	}
+
+	public String getState() {
+		return state;
+	}
+}
+
+
+public class Originator {
+	
+	//this String is just for example
+	//in real world application this 
+	//will be a java class - the object
+	//for which the state to be stored
+	private String state;
+
+	public void setState(String state) {
+		this.state = state;
+	}
+
+	public String getState() {
+		return state;
+	}
+
+	public Memento createMemento() {
+		return new Memento(state);
+	}
+
+	public void setMemento(Memento memento) {
+		state = memento.getState();
+	}
+}
+
+
+public class Caretaker {
+	private List statesList = new ArrayList();
+
+	public void addMemento(Memento m) {
+		statesList.add(m);
+	}
+
+	public Memento getMemento(int index) {
+		return statesList.get(index);
+	}
+}
+
+
+public class MementoClient {
+	public static void main(String[] args) {
+		Originator originator = new Originator();
+		originator.setState("Lion");
+		Memento memento = originator.createMemento();
+		Caretaker caretaker = new Caretaker();
+		caretaker.addMemento(memento);
+
+		originator.setState("Tiger");
+		originator.setState("Horse");
+		memento = originator.createMemento();
+		caretaker.addMemento(memento);
+		originator.setState("Elephant");
+		System.out
+				.println("Originator Current State: " + originator.getState());
+		System.out.println("Originator restoring to previous state...");
+		memento = caretaker.getMemento(1);
+		originator.setMemento(memento);
+		System.out
+				.println("Originator Current State: " + originator.getState());
+		System.out.println("Again restoring to previous state...");
+		memento = caretaker.getMemento(0);
+		originator.setMemento(memento);
+		System.out
+				.println("Originator Current State: " + originator.getState());
+	}
+}
+
+
+
+
+
+
